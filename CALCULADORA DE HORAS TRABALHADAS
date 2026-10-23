@@ -1,0 +1,64 @@
+from datetime import datetime, timedelta
+
+def calcular_horas_trabalhadas():
+    print("=" * 45)
+    print("      CALCULADORA DE HORAS TRABALHADAS     ")
+    print("=" * 45)
+    print("Digite os horários no formato de 24 horas (HH:MM). Exemplo: 08:30")
+
+    def ler_horario(mensagem):
+        while True:
+            try:
+                entrada = input(mensagem).strip()
+                # Converte o texto digitado "HH:MM" em um objeto de tempo válido
+                return datetime.strptime(entrada, "%H:%M")
+            except ValueError:
+                print("❌ Formato inválido! Digite novamente usando duas casas para hora e minuto (HH:MM).")
+
+    # 1. Coleta os horários do usuário
+    print("\n--- Período da Manhã ---")
+    entrada_1 = ler_horario("👉 Horário de Entrada: ")
+    saida_almoço = ler_horario("👉 Saída para o Almoço: ")
+
+    print("\n--- Período da Tarde ---")
+    retorno_almoço = ler_horario("👉 Retorno do Almoço: ")
+    saida_2 = ler_horario("👉 Horário de Saída Final: ")
+
+    # 2. Lógica de cálculo dos turnos
+    # Turno 1: Entrada até a saída para almoço
+    if saida_almoço < entrada_1:
+        saida_almoço += timedelta(days=1) # Trata caso vire o dia (trabalho noturno)
+    turno_manha = saida_almoço - entrada_1
+
+    # Turno 2: Retorno do almoço até a saída final
+    if saida_2 < retorno_almoço:
+        saida_2 += timedelta(days=1) # Trata caso vire o dia (trabalho noturno)
+    turno_tarde = saida_2 - retorno_almoço
+
+    # Tempo total de intervalo (Almoço)
+    if retorno_almoço < saida_almoço:
+        retorno_almoço += timedelta(days=1)
+    tempo_intervalo = retorno_almoço - saida_almoço
+
+    # 3. Totalização das horas de trabalho efetivo
+    total_trabalhado = turno_manha + turno_tarde
+
+    # Converte o total para horas e minutos legíveis
+    total_segundos = int(total_trabalhado.total_seconds())
+    horas_efetivas = total_segundos // 3600
+    minutos_efetivos = (total_segundos % 3600) // 60
+
+    # Converte o intervalo para horas e minutos legíveis
+    intervalo_segundos = int(tempo_intervalo.total_seconds())
+    horas_intervalo = intervalo_segundos // 3600
+    minutos_intervalo = (intervalo_segundos % 3600) // 60
+
+    # 4. Exibe o painel de resultados
+    print("\n" + "=" * 45)
+    print("📊 ESPELHO DE HORAS DO DIA:")
+    print(f"   • Tempo de Almoço:     {horas_intervalo:02d}h {minutos_intervalo:02d}min")
+    print(f"   • TOTAL TRABALHADO:    {horas_efetivas:02d}h {minutos_efetivos:02d}min")
+    print("=" * 45)
+
+if __name__ == "__main__":
+    calcular_horas_trabalhadas()
