@@ -1,0 +1,73 @@
+from datetime import datetime, timedelta
+
+def obter_data(mensagem):
+    while True:
+        try:
+            entrada = input(mensagem).strip()
+            # Converte estritamente o formato padrão brasileiro DD/MM/AAAA
+            return datetime.strptime(entrada, "%d/%m/%Y").date()
+        except ValueError:
+            print("❌ Formato inválido! Por favor, digite no formato DD/MM/AAAA (ex: 25/12/2026).")
+
+def calcular_dias_uteis():
+    print("=" * 45)
+    print("          CALCULADORA DE DIAS ÚTEIS         ")
+    print("=" * 45)
+
+    # 1. Coleta o intervalo de datas
+    print("Informe o período desejado:")
+    data_inicio = obter_data("👉 Data Inicial (DD/MM/AAAA): ")
+    data_fim = obter_data("👉 Data Final (DD/MM/AAAA): ")
+
+    if data_inicio > data_fim:
+        data_inicio, data_fim = data_fim, data_inicio
+
+    # 2. Lista de Feriados Nacionais Fixos e Móveis (Exemplo focado em 2026)
+    # Você pode adicionar ou remover datas nesta lista conforme a sua necessidade
+    feriados = {
+        datetime(2026, 1, 1).date(),   # Confraternização Universal
+        datetime(2026, 2, 16).date(),  # Carnaval (Segunda)
+        datetime(2026, 2, 17).date(),  # Carnaval (Terça)
+        datetime(2026, 4, 3).date(),   # Paixão de Cristo
+        datetime(2026, 4, 21).date(),  # Tiradentes
+        datetime(2026, 5, 1).date(),   # Dia do Trabalho
+        datetime(2026, 6, 4).date(),   # Corpus Christi
+        datetime(2026, 9, 7).date(),   # Independência do Brasil
+        datetime(2026, 10, 12).date(), # Nossa Senhora Aparecida
+        datetime(2026, 11, 2).date(),  # Finados
+        datetime(2026, 11, 15).date(), # Proclamação da República
+        datetime(2026, 11, 20).date(), # Consciência Negra
+        datetime(2026, 12, 25).date(), # Natal
+    }
+
+    # 3. Lógica de contagem percorrendo os dias do intervalo
+    dias_uteis = 0
+    dias_fim_semana = 0
+    dias_feriado = 0
+    total_dias_corridos = (data_fim - data_inicio).days + 1
+
+    data_atual = data_inicio
+    while data_atual <= data_fim:
+        # weekday() retorna: 5 para Sábado e 6 para Domingo
+        if data_atual.weekday() in (5, 6):
+            dias_fim_semana += 1
+        elif data_atual in feriados:
+            dias_feriado += 1
+        else:
+            dias_uteis += 1
+            
+        data_atual += timedelta(days=1) # Avança para o próximo dia
+
+    # 4. Exibe os resultados detalhados
+    print("\n" + "=" * 45)
+    print("📊 RESUMO DO PERÍODO:")
+    print(f"   📅 De {data_inicio.strftime('%d/%m/%Y')} até {data_fim.strftime('%d/%m/%Y')}")
+    print("-" * 45)
+    print(f"   • Total de dias corridos: {total_dias_corridos} dias")
+    print(f"   • Sábados e Domingos:     {dias_fim_semana} dias")
+    print(f"   • Feriados em dias úteis: {dias_feriado} dias")
+    print(f"   🔹 TOTAL DE DIAS ÚTEIS:   {dias_uteis} dias")
+    print("=" * 45)
+
+if __name__ == "__main__":
+    calcular_dias_uteis()
